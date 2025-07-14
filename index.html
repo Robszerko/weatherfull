@@ -7,8 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- CSERÉLD LE A 'felhasznaloneved/repo-neved' RÉSZT A SAJÁTODRA! -->
-    <script src="https://raw.githubusercontent.com/Robszerko/weatherfull/refs/heads/main/leirasok.js"></script> 
+    <!-- A HELYESEN BEHÍVOTT KÜLSŐ SCRIPT A TE GITHUBODRÓL, EGY CDN-EN KERESZTÜL -->
+    <script src="https://cdn.jsdelivr.net/gh/Robszerko/weatherfull@main/leirasok.js"></script> 
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.8.0/suncalc.min.js"></script>
     <style>
@@ -51,6 +51,8 @@
 
             /* Aktuális Téma (kezdetben éjszakai) */
             --current-sky-color-top: var(--sky-color-top-night); --current-sky-color-bottom: var(--sky-color-bottom-night); --current-text-color: var(--text-primary-night); --current-text-muted-color: var(--text-secondary-night); --current-icon-color: var(--accent-interactive-night); --current-widget-bg: var(--bg-widget-night); --current-widget-border: var(--border-widget-night); --current-container-border-color: var(--border-widget-night); --current-raining-text-color: var(--raining-text-color-night);
+            
+            --moon-phase-offset: 100%;
         }
 
         body[data-theme="day"] { --current-sky-color-top: var(--sky-color-top-day); --current-sky-color-bottom: var(--sky-color-bottom-day); --current-text-color: var(--text-primary-day); --current-text-muted-color: var(--text-secondary-day); --current-icon-color: var(--accent-interactive-day); --current-widget-bg: var(--bg-widget-day); --current-widget-border: var(--border-widget-day); --current-container-border-color: rgba(203, 213, 225, 0.55); --current-raining-text-color: var(--raining-text-color-day); }
@@ -194,14 +196,22 @@
             content: '';
             position: absolute;
             top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
             border-radius: 50%;
             background: #111827;
+            transform: translateX(var(--moon-phase-offset, 100%));
         }
-        #moon-path-icon-v2.is-waning::after { transform: translateX(calc(var(--moon-phase-offset, 0%) * -1)); }
-        #moon-path-icon-v2:not(.is-waning)::after { transform: translateX(var(--moon-phase-offset, 100%)); }
+        #moon-path-icon-v2.is-waning::after { 
+            left: auto;
+            right: 0;
+            transform: translateX(calc(var(--moon-phase-offset, 0%) * -1)); 
+        }
+        #moon-path-icon-v2:not(.is-waning)::after { 
+            left: 0;
+            right: auto;
+            transform: translateX(calc(var(--moon-phase-offset, 100%) * -1)); 
+        }
 
 
         .celestial-path-visual-v2.is-event-active .celestial-path-svg-v2, .celestial-path-visual-v2.is-event-active .path-label-v2 { opacity: 0.3; pointer-events: none; }
@@ -436,26 +446,24 @@
             const moonIconContainer = document.getElementById('moon-path-icon-v2');
             if (!moonIconContainer) return;
             let offset;
-            
+
             if (phase < 0.5) { // Növekvő
                 offset = 100 - (phase / 0.5) * 100;
             } else { // Fogyó
-                offset = ( (phase - 0.5) / 0.5) * 100;
+                offset = ((phase - 0.5) / 0.5) * 100;
             }
             moonIconContainer.style.setProperty('--moon-phase-offset', `${offset}%`);
             moonIconContainer.classList.toggle('is-waning', phase >= 0.5);
         }
-        
+
         function getRandomItem(arr) {
             if (!arr || arr.length === 0) return '';
             return arr[Math.floor(Math.random() * arr.length)];
         }
 
-        // <<< A BŐVÍTETT LEÍRÓ FÜGGVÉNYEK, AMIK A KÜLSŐ FÁJLT HASZNÁLJÁK >>>
         function getHeatIndexDescription(heatIndex, temp, context) {
             if (heatIndex == null || temp == null || typeof WEATHER_DESCRIPTIONS === 'undefined') return '';
-            const { day, evening, night, cloudy, sunrise, sunset } = WEATHER_DESCRIPTIONS.heatIndex;
-            const { isMorning, isLunchTime, isAfternoon, isEvening, isNight, isNearSunrise, isNearSunset, skyCover } = context;
+            const { isMorning, isEvening, isNight, isNearSunrise, isNearSunset, skyCover } = context;
             const isCloudyCondition = skyCover.includes('borult') || skyCover.includes('felhős');
             const diff = heatIndex - temp;
             
@@ -468,13 +476,13 @@
                 if (isCloudyCondition) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.hot.cloudy);
                 if (isEvening) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.hot.evening);
                 if (isNight) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.hot.night);
-                return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.hot.day);
+                return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.hot.sunny);
             }
             if (heatIndex > 25) {
                 if (isCloudyCondition) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.warm.cloudy);
                 if (isMorning) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.warm.morning);
                 if (isEvening) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.warm.evening);
-                return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.warm.day);
+                return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.warm.sunny);
             }
             if (heatIndex > 20) {
                 if (isCloudyCondition) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.mild.cloudy);
@@ -534,7 +542,7 @@
             if (gustSpeed < 80) return getRandomItem(WEATHER_DESCRIPTIONS.windGust.veryStrong);
             return getRandomItem(WEATHER_DESCRIPTIONS.windGust.gale);
         }
-
+        
         function getUVDescription(uvIndex) {
             if (uvIndex == null) return '';
             if (uvIndex <= 2) return '(Alacsony)';
