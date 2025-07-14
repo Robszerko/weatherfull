@@ -7,8 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- HELYES, CDN-EN KERESZTÜL SZOLGÁLTATOTT SCRIPT LINK -->
-    <script src="https://cdn.jsdelivr.net/gh/Robszerko/weatherfull@main/leirasok.js"></script> 
+    <!-- JAVÍTVA: A SCRIPT BETÖLTÉSE A 'defer' ATTRIBÚTUMMAL, AMI MEGOLDJA A VERSENYHELYZETET -->
+    <script src="https://cdn.jsdelivr.net/gh/Robszerko/weatherfull@main/leirasok.js" defer></script> 
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.8.0/suncalc.min.js"></script>
     <style>
@@ -445,9 +445,10 @@
             const moonIconContainer = document.getElementById('moon-path-icon-v2');
             if (!moonIconContainer) return;
             let offset;
-            if (phase < 0.5) {
+            
+            if (phase < 0.5) { // Növekvő
                 offset = 100 - (phase / 0.5) * 100;
-            } else {
+            } else { // Fogyó
                 offset = ((phase - 0.5) / 0.5) * 100;
             }
             moonIconContainer.style.setProperty('--moon-phase-offset', `${offset}%`);
@@ -459,11 +460,12 @@
             return arr[Math.floor(Math.random() * arr.length)];
         }
 
-        // <<< A BŐVÍTETT, KONTEXTUS-ÉRZÉKENY FÜGGVÉNYEK >>>
+        // <<< JAVÍTOTT, BIZTONSÁGOS ÉS BŐVÍTETT FÜGGVÉNYEK >>>
         function getHeatIndexDescription(heatIndex, temp, context) {
             if (heatIndex == null || temp == null || typeof WEATHER_DESCRIPTIONS === 'undefined') return '';
             const { isMorning, isEvening, isNight, isNearSunrise, isNearSunset, skyCover } = context;
-            const isCloudyCondition = skyCover.includes('borult') || skyCover.includes('felhős');
+            const isCloudyCondition = (skyCover || '').includes('borult') || (skyCover || '').includes('felhős');
+            const isSunnyCondition = skyCover.includes('napos') || skyCover.includes('derült');
             const diff = heatIndex - temp;
             
             const desc = WEATHER_DESCRIPTIONS.heatIndex;
@@ -483,11 +485,13 @@
                 if (isCloudyCondition) return getRandomItem(desc.warm.cloudy);
                 if (isMorning) return getRandomItem(desc.warm.morning);
                 if (isEvening) return getRandomItem(desc.warm.evening);
+                if (isSunnyCondition) return getRandomItem(desc.warm.sunny);
                 return getRandomItem(desc.warm.day);
             }
             if (heatIndex > 20) {
                 if (isCloudyCondition) return getRandomItem(desc.mild.cloudy);
                 if (isMorning) return getRandomItem(desc.mild.morning);
+                if (isSunnyCondition) return getRandomItem(desc.mild.sunny);
                 return getRandomItem(desc.mild.day);
             }
             if (heatIndex > 15) {
