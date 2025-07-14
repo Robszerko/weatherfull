@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- A HELYESEN BEHÍVOTT KÜLSŐ SCRIPT A TE GITHUBODRÓL, EGY CDN-EN KERESZTÜL -->
+    <!-- HELYES, CDN-EN KERESZTÜL SZOLGÁLTATOTT SCRIPT LINK -->
     <script src="https://cdn.jsdelivr.net/gh/Robszerko/weatherfull@main/leirasok.js"></script> 
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.8.0/suncalc.min.js"></script>
@@ -200,12 +200,11 @@
             height: 100%;
             border-radius: 50%;
             background: #111827;
-            transform: translateX(var(--moon-phase-offset, 100%));
         }
         #moon-path-icon-v2.is-waning::after { 
             left: auto;
             right: 0;
-            transform: translateX(calc(var(--moon-phase-offset, 0%) * -1)); 
+            transform: translateX(var(--moon-phase-offset, 100%)); 
         }
         #moon-path-icon-v2:not(.is-waning)::after { 
             left: 0;
@@ -446,16 +445,15 @@
             const moonIconContainer = document.getElementById('moon-path-icon-v2');
             if (!moonIconContainer) return;
             let offset;
-
-            if (phase < 0.5) { // Növekvő
+            if (phase < 0.5) {
                 offset = 100 - (phase / 0.5) * 100;
-            } else { // Fogyó
+            } else {
                 offset = ((phase - 0.5) / 0.5) * 100;
             }
             moonIconContainer.style.setProperty('--moon-phase-offset', `${offset}%`);
             moonIconContainer.classList.toggle('is-waning', phase >= 0.5);
         }
-
+        
         function getRandomItem(arr) {
             if (!arr || arr.length === 0) return '';
             return arr[Math.floor(Math.random() * arr.length)];
@@ -513,7 +511,7 @@
         }
 
         function getWindDescription(windSpeed, gustSpeed, context) {
-            if (windSpeed == null || typeof WEATHER_DESCRIPTIONS === 'undefined') return 'n/a';
+            if (windSpeed == null || typeof WEATHER_DESCRIPTIONS === 'undefined') return '';
             const { isDay, skyCover } = context;
             const isStormy = (skyCover || '').includes('vihar');
             
