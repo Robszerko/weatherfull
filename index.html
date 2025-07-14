@@ -459,86 +459,91 @@
             return arr[Math.floor(Math.random() * arr.length)];
         }
 
+        // <<< A BŐVÍTETT, KONTEXTUS-ÉRZÉKENY FÜGGVÉNYEK >>>
         function getHeatIndexDescription(heatIndex, temp, context) {
             if (heatIndex == null || temp == null || typeof WEATHER_DESCRIPTIONS === 'undefined') return '';
             const { isMorning, isEvening, isNight, isNearSunrise, isNearSunset, skyCover } = context;
             const isCloudyCondition = skyCover.includes('borult') || skyCover.includes('felhős');
             const diff = heatIndex - temp;
             
+            const desc = WEATHER_DESCRIPTIONS.heatIndex;
+
             if (heatIndex > 35) {
-                if (isEvening) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.extremeHeat.evening);
-                if (isNight) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.extremeHeat.night);
-                return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.extremeHeat.day);
+                if (isEvening) return getRandomItem(desc.extremeHeat.evening);
+                if (isNight) return getRandomItem(desc.extremeHeat.night);
+                return getRandomItem(desc.extremeHeat.day);
             }
             if (heatIndex > 30) {
-                if (isCloudyCondition) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.hot.cloudy);
-                if (isEvening) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.hot.evening);
-                if (isNight) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.hot.night);
-                return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.hot.sunny);
+                if (isCloudyCondition) return getRandomItem(desc.hot.cloudy);
+                if (isEvening) return getRandomItem(desc.hot.evening);
+                if (isNight) return getRandomItem(desc.hot.night);
+                return getRandomItem(desc.hot.sunny);
             }
             if (heatIndex > 25) {
-                if (isCloudyCondition) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.warm.cloudy);
-                if (isMorning) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.warm.morning);
-                if (isEvening) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.warm.evening);
-                return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.warm.sunny);
+                if (isCloudyCondition) return getRandomItem(desc.warm.cloudy);
+                if (isMorning) return getRandomItem(desc.warm.morning);
+                if (isEvening) return getRandomItem(desc.warm.evening);
+                return getRandomItem(desc.warm.day);
             }
             if (heatIndex > 20) {
-                if (isCloudyCondition) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.mild.cloudy);
-                if (isMorning) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.mild.morning);
-                return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.mild.day);
+                if (isCloudyCondition) return getRandomItem(desc.mild.cloudy);
+                if (isMorning) return getRandomItem(desc.mild.morning);
+                return getRandomItem(desc.mild.day);
             }
             if (heatIndex > 15) {
-                if (isNearSunrise) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.cool.sunrise);
-                if (isNearSunset) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.cool.sunset);
-                if (isEvening) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.cool.evening);
-                return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.cool.day);
+                if (isNearSunrise) return getRandomItem(desc.cool.sunrise);
+                if (isNearSunset) return getRandomItem(desc.cool.sunset);
+                if (isEvening) return getRandomItem(desc.cool.evening);
+                return getRandomItem(desc.cool.day);
             }
             if (heatIndex < 5) {
-                if (diff < -4) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.cold.windy);
-                if (isMorning) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.veryCold.morning);
-                if (isNight) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.veryCold.night);
-                return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.veryCold.day);
+                if (diff < -4) return getRandomItem(desc.cold.windy);
+                if (isMorning) return getRandomItem(desc.veryCold.morning);
+                if (isNight) return getRandomItem(desc.veryCold.night);
+                return getRandomItem(desc.veryCold.day);
             }
             if (heatIndex < 10) {
-                if (isMorning) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.cold.morning);
-                if (isNight) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.cold.night);
-                return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.cold.day);
+                if (isMorning) return getRandomItem(desc.cold.morning);
+                if (isNight) return getRandomItem(desc.cold.night);
+                return getRandomItem(desc.cold.day);
             }
-            if (diff < -3) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.misc.windChill);
-            if (diff > 3) return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.misc.muggy);
+            if (diff < -3) return getRandomItem(desc.misc.windChill);
+            if (diff > 3) return getRandomItem(desc.misc.muggy);
             
-            return getRandomItem(WEATHER_DESCRIPTIONS.heatIndex.misc.neutral);
+            return getRandomItem(desc.misc.neutral);
         }
 
         function getWindDescription(windSpeed, gustSpeed, context) {
             if (windSpeed == null || typeof WEATHER_DESCRIPTIONS === 'undefined') return '';
             const { isDay, skyCover } = context;
             const isStormy = (skyCover || '').includes('vihar');
+            const desc = WEATHER_DESCRIPTIONS.wind;
             
-            if (isStormy && windSpeed > 30) return getRandomItem(WEATHER_DESCRIPTIONS.wind.storm);
-            if (windSpeed <= 2) return gustSpeed > 7 ? getRandomItem(WEATHER_DESCRIPTIONS.wind.calmWithGusts) : getRandomItem(WEATHER_DESCRIPTIONS.wind.calm);
-            if (windSpeed <= 6) return isDay ? getRandomItem(WEATHER_DESCRIPTIONS.wind.light.day) : getRandomItem(WEATHER_DESCRIPTIONS.wind.light.night);
-            if (windSpeed <= 12) return isDay ? getRandomItem(WEATHER_DESCRIPTIONS.wind.moderate.day) : getRandomItem(WEATHER_DESCRIPTIONS.wind.moderate.night);
-            if (windSpeed <= 20) return getRandomItem(WEATHER_DESCRIPTIONS.wind.fresh);
-            if (windSpeed <= 30) return getRandomItem(WEATHER_DESCRIPTIONS.wind.strong);
-            if (windSpeed <= 40) return getRandomItem(WEATHER_DESCRIPTIONS.wind.veryStrong);
-            if (windSpeed <= 50) return getRandomItem(WEATHER_DESCRIPTIONS.wind.gale);
-            return getRandomItem(WEATHER_DESCRIPTIONS.wind.stormy);
+            if (isStormy && windSpeed > 30) return getRandomItem(desc.storm);
+            if (windSpeed <= 2) return gustSpeed > 7 ? getRandomItem(desc.calmWithGusts) : getRandomItem(desc.calm);
+            if (windSpeed <= 6) return isDay ? getRandomItem(desc.light.day) : getRandomItem(desc.light.night);
+            if (windSpeed <= 12) return isDay ? getRandomItem(desc.moderate.day) : getRandomItem(desc.moderate.night);
+            if (windSpeed <= 20) return getRandomItem(desc.fresh);
+            if (windSpeed <= 30) return getRandomItem(desc.strong);
+            if (windSpeed <= 40) return getRandomItem(desc.veryStrong);
+            if (windSpeed <= 50) return getRandomItem(desc.gale);
+            return getRandomItem(desc.stormy);
         }
 
         function getWindGustDescription(gustSpeed, windSpeed, context) {
             if (gustSpeed == null || windSpeed == null || typeof WEATHER_DESCRIPTIONS === 'undefined') return '';
             const { isDay, skyCover } = context;
             const isStormy = (skyCover || '').includes('vihar');
+            const desc = WEATHER_DESCRIPTIONS.windGust;
 
-            if (gustSpeed < windSpeed + 5) return getRandomItem(WEATHER_DESCRIPTIONS.windGust.calm);
-            if (isStormy && gustSpeed > 50) return getRandomItem(WEATHER_DESCRIPTIONS.windGust.storm);
-            if (gustSpeed < 15) return getRandomItem(WEATHER_DESCRIPTIONS.windGust.light);
-            if (gustSpeed < 30) return isDay ? getRandomItem(WEATHER_DESCRIPTIONS.windGust.moderate.day) : getRandomItem(WEATHER_DESCRIPTIONS.windGust.moderate.night);
-            if (gustSpeed < 45) return isDay ? getRandomItem(WEATHER_DESCRIPTIONS.windGust.fresh.day) : getRandomItem(WEATHER_DESCRIPTIONS.windGust.fresh.night);
-            if (gustSpeed < 60) return getRandomItem(WEATHER_DESCRIPTIONS.windGust.strong);
-            if (gustSpeed < 80) return getRandomItem(WEATHER_DESCRIPTIONS.windGust.veryStrong);
-            return getRandomItem(WEATHER_DESCRIPTIONS.windGust.gale);
+            if (gustSpeed < windSpeed + 5) return getRandomItem(desc.calm);
+            if (isStormy && gustSpeed > 50) return getRandomItem(desc.storm);
+            if (gustSpeed < 15) return getRandomItem(desc.light);
+            if (gustSpeed < 30) return isDay ? getRandomItem(desc.moderate.day) : getRandomItem(desc.moderate.night);
+            if (gustSpeed < 45) return isDay ? getRandomItem(desc.fresh.day) : getRandomItem(desc.fresh.night);
+            if (gustSpeed < 60) return getRandomItem(desc.strong);
+            if (gustSpeed < 80) return getRandomItem(desc.veryStrong);
+            return getRandomItem(desc.gale);
         }
         
         function getUVDescription(uvIndex) {
